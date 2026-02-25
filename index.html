@@ -40,6 +40,8 @@
       display: flex;
       flex-direction: column;
       background: linear-gradient(180deg, #f9fbff 0%, #eef2ff 100%);
+      position: relative;
+      overflow: hidden;
     }
 
     .app-header {
@@ -47,6 +49,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      z-index: 2;
     }
 
     .brand {
@@ -143,8 +146,8 @@
       inset: 0;
       background: linear-gradient(
         135deg,
-        rgba(15, 23, 42, 0.15),
-        rgba(15, 23, 42, 0.7)
+        rgba(15, 23, 42, 0.2),
+        rgba(15, 23, 42, 0.8)
       );
       padding: 14px 14px 12px;
       display: flex;
@@ -253,6 +256,7 @@
       flex-direction: column;
       align-items: center;
       gap: 6px;
+      cursor: pointer;
     }
 
     .buddy-avatar {
@@ -260,6 +264,7 @@
       height: 58px;
       border-radius: 999px;
       object-fit: cover;
+      display: block;
       border: 2px solid #e5e7eb;
     }
 
@@ -284,6 +289,7 @@
       display: flex;
       gap: 10px;
       align-items: flex-start;
+      cursor: pointer;
     }
 
     .list-thumb-wrapper {
@@ -379,6 +385,7 @@
       background: rgba(248, 250, 252, 0.94);
       backdrop-filter: blur(20px);
       box-shadow: 0 -4px 18px rgba(15, 23, 42, 0.07);
+      z-index: 5;
     }
 
     .bottom-nav-inner {
@@ -413,6 +420,145 @@
       color: #1d4ed8;
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
       transform: translateY(-1px);
+    }
+
+    /* Modal styles */
+    .hidden {
+      display: none !important;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .modal {
+      width: 92%;
+      max-width: 420px;
+      border-radius: 22px;
+      background: #f9fafb;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.45);
+      overflow: hidden;
+      animation: popIn 0.2s ease-out;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-body {
+      padding: 12px 14px 14px;
+    }
+
+    .modal-type {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+    }
+
+    .modal-description {
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .modal-tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 7px 13px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+      flex: 1;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 72px;
+      transform: translateX(-50%);
+      padding: 8px 14px;
+      background: #111827;
+      color: #f9fafb;
+      border-radius: 999px;
+      font-size: 13px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -6px);
+      pointer-events: auto;
     }
 
     @media (min-width: 768px) {
@@ -462,7 +608,7 @@
             <div class="hero-title">Find your travel buddy ✈️</div>
           </div>
           <div class="hero-bottom-row">
-            <button class="hero-cta" type="button">
+            <button class="hero-cta" type="button" id="cta-find-buddies">
               <span>Find travel buddies</span> <span>›</span>
             </button>
             <div class="hero-pill">3 trips near you</div>
@@ -476,7 +622,12 @@
       </div>
 
       <div class="scroll-row">
-        <article class="buddy-card">
+        <article class="buddy-card"
+                 data-type="Buddy"
+                 data-title="Alex, 22 · Backpacking Thailand"
+                 data-subtitle="Solo traveller from Sydney"
+                 data-description="Heading through Chiang Mai, Pai and the Thai islands in August. Looking for 1–2 chill people to share hostels, street food and overnight trains."
+                 data-tags="Backpacking,Thailand,Hostels">
           <img
             class="buddy-avatar"
             src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
@@ -486,7 +637,12 @@
           <div class="buddy-meta">Backpacking Thailand</div>
         </article>
 
-        <article class="buddy-card">
+        <article class="buddy-card"
+                 data-type="Buddy"
+                 data-title="Jess, 21 • Exploring Barcelona"
+                 data-subtitle="From London · first solo trip"
+                 data-description="Staying in the Gothic Quarter and hitting the beach, cafés and vintage shops. Down for tapas nights and walking tours."
+                 data-tags="Barcelona,City vibes,Tapas">
           <img
             class="buddy-avatar"
             src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80"
@@ -496,7 +652,12 @@
           <div class="buddy-meta">Exploring Barcelona</div>
         </article>
 
-        <article class="buddy-card">
+        <article class="buddy-card"
+                 data-type="Buddy"
+                 data-title="Ryan, 24 • Surfing Bali"
+                 data-subtitle="From Melbourne · surfer & photographer"
+                 data-description="Two weeks between Canggu and Uluwatu. Sunrise surf, scooter days and sunset photos. Looking for surf buddies & hostel crew."
+                 data-tags="Bali,Surf,Sunsets">
           <img
             class="buddy-avatar"
             src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80"
@@ -512,7 +673,13 @@
         <div class="section-link">Create trip</div>
       </div>
 
-      <article class="list-card">
+      <article class="list-card buddy-card"
+               data-type="Trip"
+               data-image="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80"
+               data-title="Japan in August · 10 days"
+               data-subtitle="Emily · looking for 1–3 people to join"
+               data-description="Route: Tokyo → Kyoto → Osaka. Mix of anime spots, night walks, temples and ramen. Budget hostels + JR pass. Perfect for a first big solo adventure with a mini-crew."
+               data-tags="Tokyo,Kyoto,Hostels,Anime">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -523,7 +690,7 @@
         <div style="flex:1;">
           <div class="list-main-title">Japan in August</div>
           <div class="list-sub">
-            Emily • “Who wants to join? Anime, arcades & city exploring”
+            Emily • “Anime, arcades & city exploring. Join me?”
           </div>
           <div class="tag-row">
             <span class="tag tag-strong">Tokyo</span>
@@ -533,7 +700,13 @@
         </div>
       </article>
 
-      <article class="list-card">
+      <article class="list-card buddy-card"
+               data-type="Trip"
+               data-image="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80"
+               data-title="Paris weekend · 3 days"
+               data-subtitle="Jake · café-hopping & photo walks"
+               data-description="Cheap Eurostar deal from London, staying in a shared hostel near Montmartre. Sunrise at the Eiffel Tower, late-night crêpes and Louvre + bookstore wanderings."
+               data-tags="Paris,Cafés,Photography">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -569,7 +742,7 @@
             <div class="hero-title">Hot travel deals 🔥</div>
           </div>
           <div class="hero-bottom-row">
-            <button class="hero-cta" type="button">
+            <button class="hero-cta" type="button" id="cta-latest-deals">
               <span>See latest deals</span> <span>›</span>
             </button>
             <div class="hero-pill">
@@ -587,7 +760,13 @@
         <div class="chip">Asia</div>
       </div>
 
-      <article class="list-card">
+      <article class="list-card deal-card"
+               data-type="Deal"
+               data-image="https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=900&q=80"
+               data-title="Bali adventure · $299 RT"
+               data-subtitle="Flights + hostel • 5 nights • from SYD / MEL"
+               data-description="Round-trip flights plus 5 nights in a top-rated Canggu hostel. Perfect for a first solo trip with other 18–25 travellers. Flexible dates over the next 3 months."
+               data-tags="Bali,Beach,Hostel">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -611,7 +790,13 @@
         </div>
       </article>
 
-      <article class="list-card">
+      <article class="list-card deal-card"
+               data-type="Deal"
+               data-image="https://images.unsplash.com/photo-1521292270410-a8c53642e9d0?auto=format&fit=crop&w=900&q=80"
+               data-title="Amsterdam escape · $189 RT"
+               data-subtitle="Flight sale • 3–4 days • from London"
+               data-description="Crazy cheap weekend return to Amsterdam from London. Ideal for canals, bikes, museums and late-night fries. Works perfectly as a quick group trip."
+               data-tags="Amsterdam,City break,Weekend">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -633,7 +818,13 @@
         </div>
       </article>
 
-      <article class="list-card">
+      <article class="list-card deal-card"
+               data-type="Deal"
+               data-image="https://images.unsplash.com/photo-1505739779101-0f83e99a8b98?auto=format&fit=crop&w=900&q=80"
+               data-title="Greek islands hopping · $359"
+               data-subtitle="Island ferries + hostels • 5 days"
+               data-description="Jump between 2–3 Greek islands with flexible ferry tickets and hostel stays. Sunsets, boats and endless photo spots, for less than a big-city weekend."
+               data-tags="Greece,Islands,Boats">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -672,7 +863,7 @@
             <div class="hero-title">Destination reviews ⭐</div>
           </div>
           <div class="hero-bottom-row">
-            <button class="hero-cta" type="button">
+            <button class="hero-cta" type="button" id="cta-write-review">
               <span>Write a review</span> <span>✎</span>
             </button>
             <div class="hero-pill">Tokyo • Bali • Lisbon</div>
@@ -680,7 +871,13 @@
         </div>
       </div>
 
-      <article class="list-card">
+      <article class="list-card review-card"
+               data-type="Review"
+               data-image="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=900&q=80"
+               data-title="Tokyo, Japan · 5★"
+               data-subtitle="Sara · 23 · solo + hostels"
+               data-description="“Loved Shibuya! Amazing food & super safe for solo travel. Late-night arcades felt totally fine walking alone, but the tourist trap bars are overpriced and not worth it.”"
+               data-tags="Tokyo,Safe solo,Food">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -694,13 +891,19 @@
           </div>
           <div class="list-sub">Sara • 23 • solo + hostels</div>
           <div class="review-text">
-            Loved Shibuya! Amazing food &amp; super safe for solo travel 🌃🍜 but
-            avoid the tourist trap bars at night – pricey &amp; mid.
+            Loved Shibuya! Amazing food &amp; super safe for solo travel 🌃🍜
+            but avoid the tourist trap bars at night – pricey &amp; mid.
           </div>
         </div>
       </article>
 
-      <article class="list-card">
+      <article class="list-card review-card"
+               data-type="Review"
+               data-image="https://images.unsplash.com/photo-1526481280695-3c687fd543c0?auto=format&fit=crop&w=900&q=80"
+               data-title="Bali, Indonesia · 4★"
+               data-subtitle="Josh · 21 · surf + coworking"
+               data-description="“Canggu is digital nomad heaven. Great cafés, surf and sunset spots, but traffic is chaos and scooters are wild. Amazing if you like beach clubs, less great if you hate crowds.”"
+               data-tags="Bali,Surf,Cafés">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -720,7 +923,13 @@
         </div>
       </article>
 
-      <article class="list-card">
+      <article class="list-card review-card"
+               data-type="Review"
+               data-image="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=900&q=80"
+               data-title="Lisbon, Portugal · 5★"
+               data-subtitle="Mia · 24 · first solo trip"
+               data-description="“Perfect starter city. Walkable, friendly, cheap hostels and easy day trips to Sintra and the beaches. Only downside: those hills are brutal, so pack comfy shoes.”"
+               data-tags="Lisbon,Starter city,Hostels">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -755,7 +964,7 @@
             <div class="hero-title">Find your travel crew 🧡</div>
           </div>
           <div class="hero-bottom-row">
-            <button class="hero-cta" type="button">
+            <button class="hero-cta" type="button" id="cta-browse-trips">
               <span>Browse group trips</span> <span>›</span>
             </button>
             <div class="hero-pill">New trips this week</div>
@@ -763,7 +972,13 @@
         </div>
       </div>
 
-      <article class="list-card">
+      <article class="list-card crew-card"
+               data-type="Group Trip"
+               data-image="https://images.unsplash.com/photo-1533107862482-0e6974b06ec4?auto=format&fit=crop&w=900&q=80"
+               data-title="Bali beach trip · girls only"
+               data-subtitle="July 10–15 · Uluwatu & Canggu"
+               data-description="Small 6–8 person crew staying in hostels and shared villas. Sunrise cliffs, scooter days and beach club sunsets. Ideal if it’s your first big solo trip but you don’t want to be alone."
+               data-tags="Girls only,Bali,Sunsets">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -777,7 +992,7 @@
             <span class="spots-pill">4 spots left</span>
           </div>
           <div class="list-sub">
-            Girls only • July 10–15 • Uluwatu & Canggu
+            Girls only • July 10–15 • Uluwatu &amp; Canggu
           </div>
           <div class="tag-row">
             <span class="tag tag-strong">Surf & sunsets</span>
@@ -786,7 +1001,13 @@
         </div>
       </article>
 
-      <article class="list-card">
+      <article class="list-card crew-card"
+               data-type="Group Trip"
+               data-image="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80"
+               data-title="Tokyo adventure · mixed group"
+               data-subtitle="July 20–24 • city, arcades & food"
+               data-description="Spend 4 packed days hitting Akihabara, Shibuya, karaoke, night views and ramen spots. Perfect for anime fans and first-timers who want a built-in crew."
+               data-tags="Tokyo,Anime,Ramen">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -800,7 +1021,7 @@
             <span class="spots-pill">Let’s go</span>
           </div>
           <div class="list-sub">
-            Mixed group • July 20–24 • city, arcades & food
+            Mixed group • July 20–24 • city, arcades &amp; food
           </div>
           <div class="tag-row">
             <span class="tag tag-strong">Anime & tech</span>
@@ -809,7 +1030,13 @@
         </div>
       </article>
 
-      <article class="list-card">
+      <article class="list-card crew-card"
+               data-type="Group Trip"
+               data-image="https://images.unsplash.com/photo-1526403222024-21207b2c3c5a?auto=format&fit=crop&w=900&q=80"
+               data-title="Weekend in Amsterdam · chill crew"
+               data-subtitle="This weekend • canals & vintage shops"
+               data-description="Arrive Friday night, leave Sunday evening. Canal walks, vintage shopping, brunch spots and one low-key night out. Perfect for your first short trip with strangers who won’t feel like strangers for long."
+               data-tags="Amsterdam,Weekend,City break">
         <div class="list-thumb-wrapper">
           <img
             class="list-thumb-img"
@@ -855,9 +1082,42 @@
       </button>
     </div>
   </nav>
+
+  <!-- Modal -->
+  <div id="modal-backdrop"
+       class="modal-backdrop hidden"
+       role="dialog"
+       aria-modal="true"
+       style="display: none;">
+    <div class="modal">
+      <img id="modal-img" class="modal-img" src="" alt="" />
+      <div class="modal-body">
+        <div id="modal-type" class="modal-type"></div>
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-subtitle" class="modal-subtitle"></div>
+        <div id="modal-description" class="modal-description"></div>
+        <div id="modal-tags" class="modal-tag-row"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" id="modal-close">
+            Close
+          </button>
+          <button class="btn btn-primary" type="button" id="modal-action">
+            Save &amp; follow
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <span id="toast-icon">✨</span>
+    <span id="toast-text">Saved</span>
+  </div>
 </div>
 
 <script>
+  // Tab navigation
   const navItems = document.querySelectorAll(".nav-item");
   const screens = document.querySelectorAll(".screen");
 
@@ -874,10 +1134,132 @@
     });
   });
 
+  // Toast logic
+  const toast = document.getElementById("toast");
+  const toastText = document.getElementById("toast-text");
+  const toastIcon = document.getElementById("toast-icon");
+  let toastTimeout;
+
+  function showToast(message, icon = "✨") {
+    toastText.textContent = message;
+    toastIcon.textContent = icon;
+    toast.classList.add("show");
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2600);
+  }
+
+  // Modal logic
+  const modalBackdrop = document.getElementById("modal-backdrop");
+  const modalImg = document.getElementById("modal-img");
+  const modalType = document.getElementById("modal-type");
+  const modalTitle = document.getElementById("modal-title");
+  const modalSubtitle = document.getElementById("modal-subtitle");
+  const modalDescription = document.getElementById("modal-description");
+  const modalTags = document.getElementById("modal-tags");
+  const modalClose = document.getElementById("modal-close");
+  const modalAction = document.getElementById("modal-action");
+
+  function openModalFromElement(el) {
+    const type = el.dataset.type || "Details";
+    const title = el.dataset.title || "";
+    const subtitle = el.dataset.subtitle || "";
+    const description = el.dataset.description || "";
+    const image = el.dataset.image || el.querySelector("img")?.src || "";
+    const tags = (el.dataset.tags || "").split(",");
+
+    modalType.textContent = type;
+    modalTitle.textContent = title;
+    modalSubtitle.textContent = subtitle;
+    modalDescription.textContent = description;
+    modalImg.src = image;
+    modalImg.alt = title || type;
+
+    modalTags.innerHTML = "";
+    tags
+      .filter(Boolean)
+      .map((t) => t.trim())
+      .forEach((tag) => {
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = tag;
+        modalTags.appendChild(span);
+      });
+
+    modalBackdrop.classList.remove("hidden");
+    modalBackdrop.style.display = "flex";
+  }
+
+  function closeModal() {
+    modalBackdrop.classList.add("hidden");
+    modalBackdrop.style.display = "none";
+  }
+
+  if (modalClose) {
+    modalClose.addEventListener("click", closeModal);
+  }
+
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) closeModal();
+    });
+  }
+
+  if (modalAction) {
+    modalAction.addEventListener("click", () => {
+      closeModal();
+      showToast("Saved to your trips ✈️", "✅");
+    });
+  }
+
+  // Attach modal handlers to cards
+  document
+    .querySelectorAll(".deal-card, .review-card, .crew-card, .buddy-card")
+    .forEach((card) => {
+      card.addEventListener("click", () => openModalFromElement(card));
+    });
+
+  // CTA buttons (no modal, just toasts)
+  const ctaFind = document.getElementById("cta-find-buddies");
+  if (ctaFind) {
+    ctaFind.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showToast("Matching you with nearby solo travellers…", "🧑‍🤝‍🧑");
+    });
+  }
+
+  const ctaDeals = document.getElementById("cta-latest-deals");
+  if (ctaDeals) {
+    ctaDeals.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showToast("Pulled fresh deals for you 🔥", "💸");
+    });
+  }
+
+  const ctaReview = document.getElementById("cta-write-review");
+  if (ctaReview) {
+    ctaReview.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showToast("Review flow coming in the next build 📝", "⭐");
+    });
+  }
+
+  const ctaTrips = document.getElementById("cta-browse-trips");
+  if (ctaTrips) {
+    ctaTrips.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showToast("Showing new group trips near you…", "🧑‍🤝‍🧑");
+    });
+  }
+
+  // Tiny UX flourish: update "deal updated" time after a few seconds
   const dealUpdated = document.getElementById("deal-updated");
-  setTimeout(() => {
-    dealUpdated.textContent = "2 min ago";
-  }, 4000);
+  if (dealUpdated) {
+    setTimeout(() => {
+      dealUpdated.textContent = "2 min ago";
+    }, 4000);
+  }
 </script>
 </body>
 </html>
